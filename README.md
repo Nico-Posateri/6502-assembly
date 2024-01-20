@@ -8,3 +8,6 @@ The Stella emulator can be obtained at: https://stella-emu.github.io/
 The DASM assembler can be obtained via: https://dasm-assembler.github.io/
 
 6502 clock cycle table and other resources available at: http://www.6502.org/tutorials/6502opcodes.html
+
+6502 Assembly course taught by Gustavo Pezzi:
+https://github.com/gustavopezzi
