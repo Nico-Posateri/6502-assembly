@@ -281,14 +281,21 @@ EndPositionUpdate               ; Fallback for the position update code
 CheckCollisionP0P1:
     lda #%10000000              ; CXPPMM bit 7 detects P0 and P1 collision
     bit CXPPMM                  ; Check CXPPMM with above pattern
-    bne .CollisionP0P1          ; P0 and P1 have collided
-    jmp EndCollisionCheck       ; Jump to end
-
-
+    bne .CollisionP0P1          ; If P0 and P1 have collided, game over
+    jmp CheckCollisionP0PF      ; Else, jump to next check
 .CollisionP0P1:
     jsr GameOver                ; Call "Game Over" subroutine upon collsion
 
+CheckCollisionP0PF:
+    lda #%10000000              ; CXP0FB bit 7 detects P0 and PF collision
+    bit CXP0FB                  ; Check CXP0FB with above pattern
+    bne .CollisionP0PF          ; If P0 has collided with PF, game over
+    jmp EndCollisionCheck       ; Else, jump to finally check
+.CollisionP0PF:
+    jsr GameOver
+
 EndCollisionCheck:              ; Fallback
+    sta CXCLR                   ; Clear collision flags before the next frame
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Loop back to start a new frame
