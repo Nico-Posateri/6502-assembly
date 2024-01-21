@@ -5,7 +5,7 @@ These projects make use of the DASM assembler and the Stella Atari 2600 emulator
 
 The Stella emulator can be obtained at: https://stella-emu.github.io/
 
-Gopher 2600 emulator was also used for its debugging tools, found at: https://github.com/JetSetIlly/Gopher2600
+The Gopher2600 emulator was also used for its debugging tools, found at: https://github.com/JetSetIlly/Gopher2600
 
 The DASM assembler can be obtained via: https://dasm-assembler.github.io/
 
