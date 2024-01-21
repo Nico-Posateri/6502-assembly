@@ -126,6 +126,21 @@ StartFrame:
     sta VBLANK                  ; Turn off VBLANK
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Display the scoreboard scanlines
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    lda #0                      ; Clear the TIA registers before each new frame
+    sta PF0
+    sta PF1
+    sta PF2
+    sta GRP0
+    sta GRP1
+    sta COLUPF
+    REPEAT 20
+        sta WSYNC               ; Displays 20 scanlines for the scoreboard
+    REPEND
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display the 96 visible scanlines of the game (because 2-line kernel)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -148,7 +163,7 @@ GameVisibleLine:
     lda #0
     sta PF2                     ; Setting PF2 bit pattern
 
-    ldx #96                     ; X counts the number of remaining scanlines
+    ldx #84                     ; X counts the number of remaining scanlines
 
 .GameLineLoop:
 
@@ -260,6 +275,22 @@ UpdateBomberPosition:
 EndPositionUpdate               ; Fallback for the position update code
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Checks for object collision
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CheckCollisionP0P1:
+    lda #%10000000              ; CXPPMM bit 7 detects P0 and P1 collision
+    bit CXPPMM                  ; Check CXPPMM with above pattern
+    bne .CollisionP0P1          ; P0 and P1 have collided
+    jmp EndCollisionCheck       ; Jump to end
+
+
+.CollisionP0P1:
+    jsr GameOver                ; Call "Game Over" subroutine upon collsion
+
+EndCollisionCheck:              ; Fallback
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Loop back to start a new frame
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
@@ -286,6 +317,16 @@ SetObjectXPos subroutine
     asl                         ; Four shift-lefts to get only the top 4 bits
     sta HMP0,Y                  ; Store the fine offset to the correct HMxx
     sta RESP0,Y                 ; Fix object position in 15-step increment
+    rts
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Subroutine to mark Game Over upon collision
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+GameOver subroutine
+
+    lda #$30
+    sta COLUBK
     rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
