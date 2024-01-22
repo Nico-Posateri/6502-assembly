@@ -68,7 +68,7 @@ Reset:
     sta Random                  ; Random = $D4
     lda #0
     sta Score
-    staa Timer                  ; Score and Timer = 0
+    sta Timer                  ; Score and Timer = 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize the pointers to the correct lookup table addresses
