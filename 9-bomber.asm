@@ -24,6 +24,8 @@ BomberXPos      byte            ; player1 X-position
 BomberYPos      byte            ; player1 Y-position
 Score           byte            ; 2-digit score stored as BCD
 Timer           byte            ; 2-digit timer stored as BCD
+OnesDigitOffset word            ; Lookup table offset for the score 1's digit
+TensDigitOffset word            ; Lookup table offset for the score 10's digit
 JetSpritePtr    word            ; Pointer to player0 sprite lookup table
 JetColorPtr     word            ; Pointer to player0 color lookup table
 BomberSpritePtr word            ; Pointer to player1 sprite lookup table
@@ -37,6 +39,7 @@ Random          byte            ; Random number generated to set enemy position
 
 JET_HEIGHT = 9                  ; player0 sprite height (# of lookup table rows)
 BOMBER_HEIGHT = 9               ; player1 sprite height
+DIGITS_HEIGHT = 5               ; Scoreboard digit height
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start our ROM code at memory address $F000
@@ -62,6 +65,9 @@ Reset:
     sta BomberYPos              ; BomberYPos = 83
     lda #%11010100
     sta Random                  ; Random = $D4
+    lda #0
+    sta Score
+    staa Timer                  ; Score and Timer = 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize the pointers to the correct lookup table addresses
@@ -105,6 +111,8 @@ StartFrame:
     ldy #1
     jsr SetObjectXPos           ; Set player1 horizontal position
 
+    jsr CalculateDigitOffset    ; Calculates the scoreboard digit lookup table offset
+
     sta WSYNC
     sta HMOVE                   ; Apply the horizontal offsets previously set
 
@@ -137,7 +145,10 @@ StartFrame:
     sta PF2
     sta GRP0
     sta GRP1
+    lda #$1C                    ; Set playfield/scoreboard color to white
     sta COLUPF
+    lda #%00000000
+    sta CTRLPF                  ; Disable playfield reflection
     REPEAT 20
         sta WSYNC               ; Displays 20 scanlines for the scoreboard
     REPEND
