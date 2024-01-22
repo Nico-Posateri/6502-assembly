@@ -302,7 +302,10 @@ CheckP0Up:
     lda #%00010000              ; player0 joystick up
     bit SWCHA
     bne CheckP0Down             ; If bit pattern doesn't match, bypass Up block
-    inc JetYPos
+    lda JetYPos
+    cmp #70                     ; If player0 Y-position > 70
+    bpl CheckP0Down             ; Then, skip increment
+    inc JetYPos                 ; Else, increment Y-position
     lda #0
     sta JetAnimOffset           ; Reset sprite animation to first frame
 
@@ -310,7 +313,10 @@ CheckP0Down:
     lda #%00100000              ; player0 joystick down
     bit SWCHA
     bne CheckP0Left             ; If bit pattern doesn't match, bypass Down block
-    dec JetYPos
+    lda JetYPos
+    cmp #5                      ; If player0 Y-position < 5
+    bmi CheckP0Left             ; Then, skip decrement
+    dec JetYPos                 ; Else, decrement Y-position
     lda #0
     sta JetAnimOffset           ; Reset sprite animation to first frame
 
@@ -318,7 +324,10 @@ CheckP0Left:
     lda #%01000000              ; player0 joystick left
     bit SWCHA
     bne CheckP0Right            ; If bit pattern doesn't match, bypass Left block
-    dec JetXPos
+    lda JetXPos
+    cmp #35                     ; If player0 X-position < 35
+    bmi CheckP0Right            ; Then, skip decrement
+    dec JetXPos                 ; Else, decrement X-position
     lda JET_HEIGHT              ; 9
     sta JetAnimOffset           ; Set animation offset to the second frame
 
@@ -326,7 +335,10 @@ CheckP0Right:
     lda #%10000000              ; player0 joystick right
     bit SWCHA
     bne EndInputCheck           ; If bit pattern doesn't match, bypass Right block
-    inc JetXPos
+    lda JetXPos
+    cmp #100                    ; If player0 X-position > 100
+    bpl EndInputCheck           ; Then, skip increment
+    inc JetXPos                 ; Else, increment X-position
     lda JET_HEIGHT              ; 9
     sta JetAnimOffset           ; Set animation offset to the second frame
 
