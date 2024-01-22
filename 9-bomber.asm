@@ -355,12 +355,22 @@ UpdateBomberPosition:
     bmi .ResetBomberPosition    ; If < 0, reset bomber Y-position back to top
     dec BomberYPos              ; Else, decrement enemy Y-position for next frame
     jmp EndPositionUpdate
-.ResetBomberPosition
+.ResetBomberPosition:
     jsr GetRandomBomberPos      ; Call subroutine for random X-position
-    inc Score                   ; Score++
-    inc Timer                   ; Timer++
 
-EndPositionUpdate               ; Fallback for the position update code
+.SetScoreValues:
+    sed                         ; Set decimal mode (BCD) for Score and Timer values
+    lda Score
+    clc
+    adc #1
+    sta Score                   ; Add 1 to Score (BCD does not work well with INC)
+    lda Timer
+    clc
+    adc #1
+    sta Timer                   ; Add 1 to Timer (BCD does not work well with INC)
+    cld                         ; Disable decimal mode after Score and Timer have updated
+
+EndPositionUpdate:              ; Fallback for the position update code
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Checks for object collision
