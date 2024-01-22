@@ -70,7 +70,7 @@ Reset:
     sta Random                  ; Random = $D4
     lda #0
     sta Score
-    sta Timer                  ; Score and Timer = 0
+    sta Timer                   ; Score and Timer = 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize the pointers to the correct lookup table addresses
@@ -150,6 +150,7 @@ StartFrame:
     sta PF2
     sta GRP0
     sta GRP1
+    sta CTRLPF
 
     ldx #DIGITS_HEIGHT          ; Start x counter with 5 (height of digits)
 
@@ -189,13 +190,15 @@ StartFrame:
     inc TensDigitOffset
     inc TensDigitOffset+1
     inc OnesDigitOffset
-    inc OnesDigitOffset+1
+    inc OnesDigitOffset+1       ; Increment all digits for the next line of data
 
-    jsr Sleep12Cycles
+    jsr Sleep12Cycles           ; Wastes 12 cycles
 
     dex                         ; X--
     sta PF1                     ; Update the playfield for the Timer display
     bne .ScoreDigitLoop         ; If dex != 0, branch to ScoreDigitLoop
+
+    sta WSYNC
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display the 96 visible scanlines of the game (because 2-line kernel)
