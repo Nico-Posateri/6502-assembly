@@ -150,9 +150,8 @@ StartFrame:
     sta COLUPF
     lda #%00000000
     sta CTRLPF                  ; Disable playfield reflection
-    REPEAT 20
-        sta WSYNC               ; Displays 20 scanlines for the scoreboard
-    REPEND
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DISPLAY SCOREBOARD SCANLINES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <<<<<<<<<<<<<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display the 96 visible scanlines of the game (because 2-line kernel)
@@ -191,7 +190,6 @@ GameVisibleLine:
 .DrawSpriteP0:
     clc                         ; Clear carry flag for addition
     adc JetAnimOffset           ; Jump to the correct sprite frame address in memory
-
     tay                         ; Load Y so we can work with the pointer
     lda (JetSpritePtr),Y        ; Load player0 bitmap data from the lookup table
     sta WSYNC                   ; Wait for scanline
