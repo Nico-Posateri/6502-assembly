@@ -151,6 +151,10 @@ StartFrame:
     sta GRP0
     sta GRP1
     sta CTRLPF
+    sta COLUBK
+
+    lda #$1E
+    sta COLUPF                  ; Set the scoreboard playfield color to yellow
 
     ldx #DIGITS_HEIGHT          ; Start x counter with 5 (height of digits)
 
@@ -200,6 +204,14 @@ StartFrame:
 
     sta WSYNC
 
+    lda #0
+    sta PF0
+    sta PF1
+    sta PF2
+    sta WSYNC
+    sta WSYNC
+    sta WSYNC
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display the 96 visible scanlines of the game (because 2-line kernel)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -223,7 +235,7 @@ GameVisibleLine:
     lda #0
     sta PF2                     ; Setting PF2 bit pattern
 
-    ldx #84                     ; X counts the number of remaining scanlines
+    ldx #85                     ; X counts the number of remaining scanlines
 
 .GameLineLoop:
 
