@@ -35,6 +35,8 @@ JetAnimOffset   byte            ; player0 sprite frame offset for animation
 Random          byte            ; Random number generated to set enemy position
 ScoreSprite     byte            ; Store the sprite bit pattern for the score
 TimerSprite     byte            ; Store the sprite bit pattern for the timer
+TerrainColor    byte            ; Store the color of the terrain playfield
+RiverColor      byte            ; Store the color of the river playfield
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define constants
@@ -217,11 +219,12 @@ StartFrame:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 GameVisibleLine:
-    lda #$84                    ; Hexadecimal color code for blue
-    sta COLUBK                  ; Store blue in background color (river)
 
-    lda #$C2                    ; Hexadecimal color code for green
-    sta COLUPF                  ; Store green in playfield color (grass)
+    lda TerrainColor
+    sta COLUPF                  ; Set the terrain background color
+
+    lda RiverColor
+    sta COLUBK                  ; Set the river background color
 
     lda #%00000001              ; Enables playfield reflection
     sta CTRLPF                  ; Stores to Control Playfield to enable
@@ -404,7 +407,10 @@ SetObjectXPos subroutine
 GameOver subroutine
 
     lda #$30
-    sta COLUBK
+    sta TerrainColor            ; Set terrain color to red upon collision
+    sta RiverColor              ; Set river color to red upon collision
+    lda #0
+    sta Score                   ; Reset score to 0 at game over
     rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
