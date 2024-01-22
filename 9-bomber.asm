@@ -71,8 +71,8 @@ Reset:
     lda #%11010100
     sta Random                  ; Random = $D4
     lda #0
-    sta Score
-    sta Timer                   ; Score and Timer = 0
+    sta Score                   ; Score = 0
+    sta Timer                   ; Timer = 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize the pointers to the correct lookup table addresses
@@ -99,13 +99,13 @@ Reset:
     sta BomberColorPtr+1        ; hi-byte pointer for bomber color lookup table
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Start the main disaply loop and frame rendering
+;; Start the main display loop and frame rendering
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 StartFrame:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Display VSYNC and VBLANK (40 scanlines)
+;; Display VSYNC and VBLANK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
     lda #2
@@ -215,7 +215,7 @@ StartFrame:
     sta WSYNC
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Display the 96 visible scanlines of the game (because 2-line kernel)
+;; Display the 96 visible scanlines of the game (not 192, because of the 2-line kernel)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 GameVisibleLine:
@@ -345,6 +345,8 @@ UpdateBomberPosition:
     jmp EndPositionUpdate
 .ResetBomberPosition
     jsr GetRandomBomberPos      ; Call subroutine for random X-position
+    inc Score                   ; Score++
+    inc Timer                   ; Timer++
 
 EndPositionUpdate               ; Fallback for the position update code
 
@@ -355,18 +357,11 @@ EndPositionUpdate               ; Fallback for the position update code
 CheckCollisionP0P1:
     lda #%10000000              ; CXPPMM bit 7 detects P0 and P1 collision
     bit CXPPMM                  ; Check CXPPMM with above pattern
-    bne .CollisionP0P1          ; If P0 and P1 have collided, game over
-    jmp CheckCollisionP0PF      ; Else, jump to next check
-.CollisionP0P1:
+    bne .P0P1Collided           ; If P0 and P1 have collided, game over
+    jsr SetTerrainRiverColor    ; Else, set playfield color to green and blue
+    jmp EndCollisionCheck       ; Else, jump to next check
+.P0P1Collided:
     jsr GameOver                ; Call "Game Over" subroutine upon collsion
-
-CheckCollisionP0PF:
-    lda #%10000000              ; CXP0FB bit 7 detects P0 and PF collision
-    bit CXP0FB                  ; Check CXP0FB with above pattern
-    bne .CollisionP0PF          ; If P0 has collided with PF, game over
-    jmp EndCollisionCheck       ; Else, jump to finally check
-.CollisionP0PF:
-    jsr GameOver
 
 EndCollisionCheck:              ; Fallback
     sta CXCLR                   ; Clear collision flags before the next frame
@@ -376,6 +371,17 @@ EndCollisionCheck:              ; Fallback
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
     jmp StartFrame              ; Continue displaying next frame
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Subroutine to set the colors for the terrain and river to green and blue
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SetTerrainRiverColor subroutine
+    lda #$C2
+    sta TerrainColor            ; Set terrain color to green
+    lda #$84
+    sta RiverColor              ; Set river color to blue
+    rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Subroutine to handle object horizontal position with fine offset
