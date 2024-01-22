@@ -22,6 +22,8 @@ JetXPos         byte            ; player0 X-position
 JetYPos         byte            ; player0 Y-position
 BomberXPos      byte            ; player1 X-position
 BomberYPos      byte            ; player1 Y-position
+Score           byte            ; 2-digit score stored as BCD
+Timer           byte            ; 2-digit timer stored as BCD
 JetSpritePtr    word            ; Pointer to player0 sprite lookup table
 JetColorPtr     word            ; Pointer to player0 color lookup table
 BomberSpritePtr word            ; Pointer to player1 sprite lookup table
