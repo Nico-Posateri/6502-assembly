@@ -103,7 +103,25 @@ Reset:
 StartFrame:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Calculations and tasks performed pre-VBLANK (jsr = jump to subroutine)
+;; Display VSYNC and VBLANK (40 scanlines)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    
+    lda #2
+    sta VBLANK                  ; Turn on VBLANK
+    sta VSYNC                   ; Turn on VSYNC
+
+    REPEAT 3
+        sta WSYNC               ; Display 3 recommended lines of VSYNC
+    REPEND
+    lda #0
+    sta VSYNC                   ; Turn off VSYNC
+
+    REPEAT 33                   ; The following block executes inside the VBLANK ...
+        sta WSYNC               ; So, display 33 remaining lines of VBLANK instead of 37
+    REPEND
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Calculations and tasks performed inside the VBLANK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     lda JetXPos
@@ -119,23 +137,7 @@ StartFrame:
     sta WSYNC
     sta HMOVE                   ; Apply the horizontal offsets previously set
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Display VSYNC and VBLANK (40 scanlines)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
-    lda #2
-    sta VBLANK                  ; Turn on VBLANK
-    sta VSYNC                   ; Turn on VSYNC
-
-    REPEAT 3
-        sta WSYNC               ; Display 3 recommended lines of VSYNC
-    REPEND
     lda #0
-    sta VSYNC                   ; Turn off VSYNC
-
-    REPEAT 37
-        sta WSYNC               ; Display 37 recommended lines of VBLANK
-    REPEND
     sta VBLANK                  ; Turn off VBLANK
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -148,14 +150,37 @@ StartFrame:
     sta PF2
     sta GRP0
     sta GRP1
-    lda #$1C                    ; Set playfield/scoreboard color to white
-    sta COLUPF
-    lda #%00000000
-    sta CTRLPF                  ; Disable playfield reflection
 
-    ...
+    ldx #DIGITS_HEIGHT          ; Start x counter with 5 (height of digits)
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DISPLAY SCOREBOARD SCANLINES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <<<<<<<<<<<<<
+.ScoreDigitLoop:
+    ldy TensDigitOffset         ; Get the tens digit offset for the score
+    lda Digits,Y                ; Load the bit pattern from the lookup table
+    and #$F0                    ; Mask/remove the graphics for the ones digit
+    sta ScoreSprite             ; Save the score tens digit pattern in a variable
+
+    ldy OnesDigitOffset         ; Get the ones digit offset for the score
+    lda Digits,Y                ; Load the bit pattern from the lookup table
+    and #$0F                    ; Mask/remove the graphics for the tens digit
+    ora ScoreSprite             ; Merge it with the saved tens digit sprite
+    sta ScoreSprite             ; Save it
+    sta WSYNC                   ; Wait for the end of the scanline
+    sta PF1                     ; Update the playfield to display the score sprite
+
+    ldy TensDigitOffset+1       ; Get the left digit offset for the timer
+    lda Digits,Y                ; Load the bit pattern from the lookup table
+    and #$F0                    ; Mask/remove the graphics for the ones digit
+    sta TimerSprite             ; Save the timer tens digit pattern in a variable
+
+    ldy OnesDigitOffset+1       ; Get the ones digit offset for the timer
+    lda Digits,Y                ; Load the bit pattern from the lookup table
+    and #$0F                    ; Mask/remove the graphics for the tens digit
+    ora TimerSprite             ; Merge it with the saved tens digit sprite
+    sta TimerSprite             ; Save it
+
+    dex                         ; X--
+    sta PF1                     ; Update the playfield for the Timer display
+    bne .ScoreDigitLoop         ; If dex != 0, branch to ScoreDigitLoop
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Display the 96 visible scanlines of the game (because 2-line kernel)
