@@ -178,6 +178,21 @@ StartFrame:
     ora TimerSprite             ; Merge it with the saved tens digit sprite
     sta TimerSprite             ; Save it
 
+    jsr Sleep12Cycles           ; Wastes 12 cycles
+
+    sta PF1                     ; Update the playfield to display the timer sprite
+
+    ldy ScoreSprite             ; Preload for the next scanline
+    sta WSYNC                   ; Wait for next scanline
+
+    sty PF1                     ; Update playfield for the score display
+    inc TensDigitOffset
+    inc TensDigitOffset+1
+    inc OnesDigitOffset
+    inc OnesDigitOffset+1
+
+    jsr Sleep12Cycles
+
     dex                         ; X--
     sta PF1                     ; Update the playfield for the Timer display
     bne .ScoreDigitLoop         ; If dex != 0, branch to ScoreDigitLoop
@@ -448,6 +463,16 @@ CalculateDigitOffset subroutine
 
     dex                         ; X--
     bpl .PrepareScoreLoop       ; While x >= 0, loop to pass a second time
+    rts
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Subroutine to waste 12 cycles
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; jsr (jump subroutine) takes 6 cycles
+;; rts (return subroutine) takes 6 cycles
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+Sleep12Cycles subroutine
     rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
