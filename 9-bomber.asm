@@ -24,6 +24,7 @@ BomberXPos      byte            ; player1 X-position
 BomberYPos      byte            ; player1 Y-position
 Score           byte            ; 2-digit score stored as BCD
 Timer           byte            ; 2-digit timer stored as BCD
+Temp            byte            ; Auxiliary variable to store temporary score values
 OnesDigitOffset word            ; Lookup table offset for the score 1's digit
 TensDigitOffset word            ; Lookup table offset for the score 10's digit
 JetSpritePtr    word            ; Pointer to player0 sprite lookup table
@@ -378,7 +379,48 @@ GetRandomBomberPos subroutine
 
     lda #96
     sta BomberYPos              ; Sets the bomber Y-position to the top of the screen
+    rts
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Subroutine to handle scoreboard digits to be displayed on the screen
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Convert the high and low nibbles of the variable Score and Timer into the offsets of
+;; the digits lookup table so the values can be displayed ... each digit has a height
+;; of 5 bytes in the lookup table ...
+;;
+;; The low nibble needs to be multiplied by 5:
+;;    - Left shifts can be used to multiply by 2
+;;    - For any number N, the value of N*5 = (N*2*2) + N
+;;
+;; The high nibble, since it's *16, needs to be divided then multiplied by 5:
+;;    - Right shifts can be used to divide by 2
+;;    - For any number N, the value of (N/16)*5 = (N/2/2) + (N/2/2/2/2)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+CalculateDigitOffset subroutine
+    ldx #1                      ; x register is the loop counter
+.PrepareScoreLoop               ; This will loop twice, first x = 1, then x = 0
+
+    lda Score,X                 ; Load A with Timer (x = 1) or Score (x = 0)
+    and #$0F                    ; Removes the 10's digit by masking 4 bits with 00001111
+    sta Temp                    ; Save value of A into Temp
+    asl                         ; Shift left, now (N*2)
+    asl                         ; Shift left, now (N*4)
+    adc Temp                    ; Add the value saved in Temp (+N)
+    sta OnesDigitOffset,X       ; Save A in in OnesDigitOffset+1 or OnesDigitOffset
+
+    lda Score,X                 ; Load A with Timer (x = 1) or Score (x = 0)
+    and #$F0                    ; Removes the 10's digit by masking 4 bits with 11110000
+    lsr                         ; Shift right, now (N/2)
+    lsr                         ; Shift right, now (N/4)
+    sta Temp                    ; Save the value of A into Temp
+    lsr                         ; Shift right, now (N/8)
+    lsr                         ; Shift right, now (N/16)
+    adc Temp                    ; Add the value saved in Temp, (N/16) + (N/4) 
+    sta TensDigitOffset,X       ; Save A in in TensDigitOffset+1 or TensDigitOffset
+
+    dex                         ; X--
+    bpl .PrepareScoreLoop       ; While x >= 0, loop to pass a second time
     rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
