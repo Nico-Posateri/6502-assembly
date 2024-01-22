@@ -33,6 +33,8 @@ BomberSpritePtr word            ; Pointer to player1 sprite lookup table
 BomberColorPtr  word            ; Pointer to player1 color lookup table
 JetAnimOffset   byte            ; player0 sprite frame offset for animation
 Random          byte            ; Random number generated to set enemy position
+ScoreSprite     byte            ; Store the sprite bit pattern for the score
+TimerSprite     byte            ; Store the sprite bit pattern for the timer
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define constants
@@ -150,6 +152,8 @@ StartFrame:
     sta COLUPF
     lda #%00000000
     sta CTRLPF                  ; Disable playfield reflection
+
+    ...
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!! DISPLAY SCOREBOARD SCANLINES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! <<<<<<<<<<<<<
 
