@@ -458,9 +458,16 @@ EndCollisionCheck:              ; Fallback
 GenerateJetSound subroutine
     lda #3
     sta AUDV0                   ; Volume
-    lda #15
+    lda JetYPos                 ; Load P0 Y-position
+    lsr
+    lsr
+    lsr                         ; Bit shift right 3 times to divide Y-position by 8
+    sta Temp                    ; Store resulting value of (Y/8) in the Temp variable
+    lda #31
+    sec
+    sbc Temp                    ; 31 - (Y/8)
     sta AUDF0                   ; Frequency
-    lda #4
+    lda #8                      ; Code for white noise
     sta AUDC0                   ; Distortion
     rts
 
