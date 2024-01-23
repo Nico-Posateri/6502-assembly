@@ -86,6 +86,7 @@ Reset:
         bne .SkipMissileDraw    ; If X != missile Y-position, skip draw
 .DrawMissile:
         lda #%00000010          ; Else, enable missile 0 display
+        inc MissileYPos         ; MissileYPos++
 .SkipMissileDraw:
         sta ENAM0               ; Store the correct value in the TIA missile register
     ENDM
@@ -373,8 +374,12 @@ CheckButtonPressed:
     bne EndInputCheck
 .ButtonPressed:
     lda JetXPos
+    clc
+    adc #5
     sta MissileXPos             ; Set missile X-position equal to player0 X-position
     lda JetYPos
+    clc
+    adc #8
     sta MissileYPos             ; Set missile Y-position equal to player0 Y-position
 
 EndInputCheck:                  ; Fallback if no input was performed
