@@ -35,4 +35,3 @@ Start:
 ;; To assemble, enter: dasm "FILE NAME".asm -f3 -v0 -ocart.bin
 ;; In Windows, you MUST include .asm extension, bin is named cart
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;
