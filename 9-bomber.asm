@@ -77,6 +77,20 @@ Reset:
     sta Timer                   ; Timer = 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Declare a MACRO to check if the missile 0 should be drawn
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    MAC DRAW_MISSILE
+        lda #%00000000
+        cpx MissileYPos         ; Compare X (current scanline) with missile Y-position
+        bne .SkipMissileDraw    ; If X != missile Y-position, skip draw
+.DrawMissile:
+        lda #%00000010          ; Else, enable missile 0 display
+.SkipMissileDraw:
+        sta ENAM0               ; Store the correct value in the TIA missile register
+    ENDM
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initialize the pointers to the correct lookup table addresses
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -135,6 +149,10 @@ StartFrame:
     lda BomberXPos
     ldy #1
     jsr SetObjectXPos           ; Set player1 horizontal position
+
+    lda MissileXPos
+    ldy #2
+    jsr SetObjectXPos           ; Set missile horizontal position
 
     jsr CalculateDigitOffset    ; Calculates the scoreboard digit lookup table offset
 
@@ -243,6 +261,7 @@ GameVisibleLine:
     ldx #85                     ; X counts the number of remaining scanlines
 
 .GameLineLoop:
+    DRAW_MISSILE                ; Macro to check if the missile should be drawn
 
 .AreWeInsideJetSprite:
     txa                         ; Transfer X to a
