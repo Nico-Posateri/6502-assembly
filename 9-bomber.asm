@@ -421,9 +421,24 @@ CheckCollisionP0P1:
     bit CXPPMM                  ; Check CXPPMM with above pattern
     bne .P0P1Collided           ; If P0 and P1 have collided, game over
     jsr SetTerrainRiverColor    ; Else, set playfield color to green and blue
-    jmp EndCollisionCheck       ; Else, jump to next check
+    jmp CheckCollisionM0P1      ; Else, jump to next check
 .P0P1Collided:
     jsr GameOver                ; Call "Game Over" subroutine upon collsion
+
+CheckCollisionM0P1:
+    lda #%10000000              ; CXM0P bit 7 detects M0 and P1 collision
+    bit CXM0P                   ; Check CXM0P with above pattern
+    bne .M0P1Collided           ; If M0 and P1 have collided, increase the score
+    jmp EndCollisionCheck       ; Else, jump to final check
+.M0P1Collided:
+    sed                         ; Start BCD
+    lda Score
+    clc
+    adc #1
+    sta Score                   ; Score++ using BCD
+    cld                         ; End BCD
+    lda #0
+    sta MissileYPos             ; Removes missile from play upon collision
 
 EndCollisionCheck:              ; Fallback
     sta CXCLR                   ; Clear collision flags before the next frame
