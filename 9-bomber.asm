@@ -400,10 +400,6 @@ UpdateBomberPosition:
 
 .SetScoreValues:
     sed                         ; Set decimal mode (BCD) for Score and Timer values
-    lda Score
-    clc
-    adc #1
-    sta Score                   ; Add 1 to Score (BCD does not work well with INC)
     lda Timer
     clc
     adc #1
