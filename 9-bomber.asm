@@ -450,9 +450,18 @@ EndCollisionCheck:              ; Fallback
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Subroutine to generate audio for the jet engine sound on the jet Y-position
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; AUDV0 & AUDV1 Channels: Volume scale from 0 (off) to 15 (loudest)
+;; AUDF0 & AUDF1 Channels: Frequency scale from 31 (lowest pitch) to 0 (highest pitch)
+;; AUDC0 & AUDC1 Channels: Circuit that alters waveform via 1 of 15 values
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 GenerateJetSound subroutine
-    ...
+    lda #3
+    sta AUDV0                   ; Volume
+    lda #15
+    sta AUDF0                   ; Frequency
+    lda #4
+    sta AUDC0                   ; Distortion
     rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
