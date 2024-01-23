@@ -157,6 +157,8 @@ StartFrame:
 
     jsr CalculateDigitOffset    ; Calculates the scoreboard digit lookup table offset
 
+    jsr GenerateJetSound        ; Configure and enable jet engine audio
+
     sta WSYNC
     sta HMOVE                   ; Apply the horizontal offsets previously set
 
@@ -444,6 +446,14 @@ EndCollisionCheck:              ; Fallback
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
     jmp StartFrame              ; Continue displaying next frame
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Subroutine to generate audio for the jet engine sound on the jet Y-position
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+GenerateJetSound subroutine
+    ...
+    rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Subroutine to set the colors for the terrain and river to green and blue
