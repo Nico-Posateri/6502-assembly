@@ -134,6 +134,7 @@ StartFrame:
     REPEND
     lda #0
     sta VSYNC                   ; Turn off VSYNC
+    sta COLUBK
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Calculations and tasks performed inside the VBLANK
