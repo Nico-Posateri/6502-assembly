@@ -122,7 +122,7 @@ Reset:
 StartFrame:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Display VSYNC and VBLANK
+;; Display 3 lines of VSYNC
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     
     lda #2
@@ -134,10 +134,6 @@ StartFrame:
     REPEND
     lda #0
     sta VSYNC                   ; Turn off VSYNC
-
-    REPEAT 33                   ; The following block executes inside the VBLANK ...
-        sta WSYNC               ; So, display 33 remaining lines of VBLANK instead of 37
-    REPEND
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Calculations and tasks performed inside the VBLANK
@@ -162,6 +158,13 @@ StartFrame:
     sta WSYNC
     sta HMOVE                   ; Apply the horizontal offsets previously set
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Display the remaining 33 lines of VBLANK (37 - 4 used above)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    REPEAT 33                   ; The previous block executes inside the VBLANK ...
+        sta WSYNC               ; So, display 33 remaining lines of VBLANK instead of 37
+    REPEND
     lda #0
     sta VBLANK                  ; Turn off VBLANK
 
