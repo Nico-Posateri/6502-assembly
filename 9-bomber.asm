@@ -274,7 +274,7 @@ GameVisibleLine:
     txa                         ; Transfer X to a
     sec                         ; Set carry flag before subtraction
     sbc JetYPos                 ; Subtract sprite Y-coordinate
-    cmp #JET_HEIGHT              ; Check if we're inside sprite height bounds
+    cmp #JET_HEIGHT             ; Check if we're inside sprite height bounds
     bcc .DrawSpriteP0           ; Result < SpriteHeight? Call new draw routine
     lda #0                      ; Else, set lookup to zero
 .DrawSpriteP0:
@@ -291,7 +291,7 @@ GameVisibleLine:
     txa                         ; Transfer X to a
     sec                         ; Set carry flag before subtraction
     sbc BomberYPos              ; Subtract sprite Y-coordinate
-    cmp #BOMBER_HEIGHT           ; Check if we're inside sprite height bounds
+    cmp #BOMBER_HEIGHT          ; Check if we're inside sprite height bounds
     bcc .DrawSpriteP1           ; Result < SpriteHeight? Call new draw routine
     lda #0                      ; Else, set lookup to zero
 .DrawSpriteP1:
@@ -359,7 +359,7 @@ CheckP0Left:
     bmi CheckP0Right            ; Then, skip decrement
 .P0LeftPressed:
     dec JetXPos                 ; Else, decrement X-position
-    lda #JET_HEIGHT              ; 9
+    lda #JET_HEIGHT             ; 9
     sta JetAnimOffset           ; Set animation offset to the second frame
 
 CheckP0Right:
@@ -371,7 +371,7 @@ CheckP0Right:
     bpl CheckButtonPressed      ; Then, skip increment
 .P0RightPressed:
     inc JetXPos                 ; Else, increment X-position
-    lda #JET_HEIGHT              ; 9
+    lda #JET_HEIGHT             ; 9
     sta JetAnimOffset           ; Set animation offset to the second frame
 
 CheckButtonPressed:
